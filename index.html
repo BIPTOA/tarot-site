@@ -76,18 +76,18 @@
     function drawCard() {
       const idx = Math.floor(Math.random() * cardNames.length);
       const name = cardNames[idx];
-      const id = idx + 1;
+      const id = idx; // <-- numbering shifted down by 1
       const result = document.getElementById('result');
       result.innerHTML = '';
 
       // Create video element
       const video = document.createElement('video');
-      video.src = `cards/card${id}.mp4`; // updated folder
+      video.src = `cards/card${id}.mp4`; // video file matches new numbering
       video.autoplay = true;
       video.loop = true;
       video.muted = true;
       video.playsInline = true;
-      video.controls = true; // temporary control to check loading
+      video.controls = true;
 
       video.onerror = () => {
         const errorMsg = document.createElement('div');
