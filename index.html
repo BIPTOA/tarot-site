@@ -39,6 +39,7 @@
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     }
     .card-name { margin-top: 12px; font-size: 20px; font-weight: 600; }
+    .error { margin-top: 12px; color: #ff6b6b; }
   </style>
 </head>
 <body>
@@ -53,19 +54,28 @@
       'The Devil', 'The Tower', 'The Star', 'The Moon', 'The Sun', 'Judgement'
     ];
 
-    function drawCard(){
+    function drawCard() {
       const idx = Math.floor(Math.random() * cardNames.length);
       const name = cardNames[idx];
       const id = idx + 1;
       const result = document.getElementById('result');
       result.innerHTML = '';
+
       const video = document.createElement('video');
-      video.src = `cards/card${id}.mp4`;
+      video.src = `cards/card${id}.mp4`; // updated folder
       video.autoplay = true;
       video.loop = true;
       video.muted = true;
       video.playsInline = true;
+      video.controls = true; // temporary control to check loading
+      video.onerror = () => {
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'error';
+        errorMsg.textContent = `Video cards/card${id}.mp4 failed to load. Check the path!`;
+        result.appendChild(errorMsg);
+      };
       result.appendChild(video);
+
       const label = document.createElement('div');
       label.className = 'card-name';
       label.textContent = `${id}. ${name}`;
@@ -76,5 +86,3 @@
   </script>
 </body>
 </html>
-
-
