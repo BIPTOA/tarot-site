@@ -84,13 +84,13 @@
       'The Fool', 'The Magician', 'The High Priestess', 'The Empress', 'The Emperor',
       'The Hierophant', 'The Lovers', 'The Chariot', 'Strength', 'The Hermit',
       'Wheel of Fortune', 'Justice', 'The Hanged Man', 'Death', 'Temperance',
-      'The Devil', 'The Tower', 'The Star', 'The Moon', 'The Sun', 'Judgement'
+      'The Devil', 'The Tower', 'The Star', 'The Moon', 'The Sun', 'Judgement', 'The World'
     ];
 
     function drawCard() {
       const idx = Math.floor(Math.random() * cardNames.length);
       const name = cardNames[idx];
-      const id = idx; // numbering matches your videos
+      const id = idx;
       const result = document.getElementById('result');
       result.innerHTML = '';
 
@@ -118,6 +118,14 @@
       label.textContent = `${id}. ${name}`;
       result.appendChild(label);
 
+      // Read More button -> links to subpage
+      const readMoreBtn = document.createElement('button');
+      readMoreBtn.textContent = 'Read More';
+      readMoreBtn.addEventListener('click', () => {
+        window.location.href = `cards/card-${id}.html`;
+      });
+      result.appendChild(readMoreBtn);
+
       // "See All Cards" button
       const seeAllBtn = document.createElement('button');
       seeAllBtn.textContent = 'See All Cards';
@@ -127,7 +135,7 @@
 
     function showAllCards() {
       const result = document.getElementById('result');
-      result.innerHTML = ''; // clear previous content
+      result.innerHTML = '';
 
       const container = document.createElement('div');
       container.className = 'all-cards-container';
@@ -143,19 +151,22 @@
         video.playsInline = true;
         video.controls = true;
 
-        video.onerror = () => {
-          const errorMsg = document.createElement('div');
-          errorMsg.className = 'error';
-          errorMsg.textContent = `Video cards/card${id}.mp4 failed to load. Check the path!`;
-          cardWrapper.appendChild(errorMsg);
-        };
-
         const label = document.createElement('div');
         label.className = 'card-name';
         label.textContent = `${id}. ${name}`;
 
+        // link to subpage on click
+        const readMoreLink = document.createElement('a');
+        readMoreLink.textContent = 'Read More';
+        readMoreLink.href = `cards/card-${id}.html`;
+        readMoreLink.style.display = 'block';
+        readMoreLink.style.marginTop = '8px';
+        readMoreLink.style.color = '#7c3aed';
+
         cardWrapper.appendChild(video);
         cardWrapper.appendChild(label);
+        cardWrapper.appendChild(readMoreLink);
+
         container.appendChild(cardWrapper);
       });
 
