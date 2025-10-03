@@ -3,73 +3,48 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tarot Randomizer — 21 Video Cards</title>
+  <title>Tarot Video Draw</title>
   <style>
-    :root{
-      --bg:#0f172a; --card-back:#0ea5a4; --card-front:#fff; --accent:#7c3aed;
-      --card-w:140px; --card-h:220px;
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(180deg,#071026,#071733);
+      font-family: system-ui, sans-serif;
+      color: #e6eef8;
+      text-align: center;
     }
-    html,body{height:100%; margin:0; font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; background:linear-gradient(180deg,#071026 0%, #071733 60%); color:#e6eef8}
-    .app{max-width:1100px;margin:28px auto;padding:18px}
-    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    h1{font-size:20px;margin:0}
-    p.small{margin:0;color:rgba(230,238,248,0.7);font-size:13px}
-    .controls{display:flex;gap:8px;align-items:center}
-    button{background:var(--accent);border:0;padding:10px 14px;border-radius:10px;color:white;font-weight:600;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,0.18)}
-    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.08);box-shadow:none}
-    .board{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card-w),1fr));gap:18px;justify-items:center}
-
-    .card{
-      width:var(--card-w); height:var(--card-h); perspective:1000px; cursor:pointer;
+    h1 { margin-bottom: 20px; font-size: 24px; }
+    button {
+      background: #7c3aed;
+      border: none;
+      padding: 16px 28px;
+      font-size: 18px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(124,58,237,0.25);
+      transition: background 0.3s;
+      margin-bottom: 20px;
     }
-    .card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 700ms cubic-bezier(.2,.9,.3,1)}
-    .card.is-flipped .card-inner{transform:rotateY(180deg)}
-    .face{position:absolute;inset:0;border-radius:12px;overflow:hidden;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;font-weight:700}
-    .back{background:linear-gradient(135deg,var(--card-back),#0b7285);color:white;padding:8px;font-size:16px}
-    .front{background:var(--card-front);color:#0b1220;transform:rotateY(180deg);padding:6px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-    .front .name{font-size:14px;margin-bottom:6px;text-align:center}
-    .front video{max-width:100%;max-height:140px;border-radius:6px;display:block}
-
-    @media (min-width:900px){
-      .board{grid-template-columns:repeat(7,minmax(var(--card-w),1fr));}
+    button:hover { background: #6d28d9; }
+    video {
+      max-width: 90%;
+      max-height: 70vh;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     }
-    @media (max-width:900px) and (min-width:640px){
-      .board{grid-template-columns:repeat(5,minmax(var(--card-w),1fr));}
-    }
-    @media (max-width:639px){
-      :root{--card-w:110px;--card-h:175px}
-    }
+    .card-name { margin-top: 12px; font-size: 20px; font-weight: 600; }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <div>
-        <h1>Tarot Randomizer — 21 Video Cards</h1>
-        <p class="small">Click a card to flip it. Use <strong>Shuffle &amp; Deal</strong> to randomize.</p>
-      </div>
-      <div class="controls">
-        <button id="shuffleBtn">Shuffle &amp; Deal</button>
-        <button id="revealAllBtn" class="ghost">Reveal All</button>
-      </div>
-    </header>
-
-    <main>
-      <div id="board" class="board" aria-live="polite"></div>
-    </main>
-  </div>
-
-  <template id="cardTemplate">
-    <div class="card" tabindex="0">
-      <div class="card-inner">
-        <div class="face back">Tarot</div>
-        <div class="face front">
-          <div class="name"></div>
-          <video playsinline muted loop></video>
-        </div>
-      </div>
-    </div>
-  </template>
+  <h1>Tarot Video Draw</h1>
+  <button id="drawBtn">Draw a Random Card</button>
+  <div id="result"></div>
 
   <script>
     const cardNames = [
@@ -78,74 +53,26 @@
       'The Devil', 'The Tower', 'The Star', 'The Moon', 'The Sun', 'Judgement'
     ];
 
-    const deck = cardNames.map((name, i) => ({id: i+1, name}));
-
-    const board = document.getElementById('board');
-    const template = document.getElementById('cardTemplate');
-    const shuffleBtn = document.getElementById('shuffleBtn');
-    const revealAllBtn = document.getElementById('revealAllBtn');
-
-    function createCardElement(cardData){
-      const el = template.content.firstElementChild.cloneNode(true);
-      el.dataset.id = cardData.id;
-      const nameEl = el.querySelector('.name');
-      const videoEl = el.querySelector('video');
-      nameEl.textContent = `${cardData.id}. ${cardData.name}`;
-
-      // Load video file from /cards/card{n}.mp4
-      videoEl.src = `cards/card${cardData.id}.mp4`;
-      videoEl.oncanplay = () => {
-        videoEl.autoplay = true;
-        videoEl.play().catch(()=>{});
-      };
-
-      el.addEventListener('click', ()=> el.classList.toggle('is-flipped'));
-      el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); el.classList.toggle('is-flipped'); } });
-      return el;
+    function drawCard(){
+      const idx = Math.floor(Math.random() * cardNames.length);
+      const name = cardNames[idx];
+      const id = idx + 1;
+      const result = document.getElementById('result');
+      result.innerHTML = '';
+      const video = document.createElement('video');
+      video.src = `cards/card${id}.mp4`;
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+      result.appendChild(video);
+      const label = document.createElement('div');
+      label.className = 'card-name';
+      label.textContent = `${id}. ${name}`;
+      result.appendChild(label);
     }
 
-    function render(order){
-      board.innerHTML = '';
-      for(const card of order){
-        const el = createCardElement(card);
-        board.appendChild(el);
-      }
-    }
-
-    function shuffleArray(array){
-      const a = array.slice();
-      for(let i=a.length-1;i>0;i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [a[i],a[j]]=[a[j],a[i]];
-      }
-      return a;
-    }
-
-    render(deck);
-
-    shuffleBtn.addEventListener('click', ()=>{
-      const shuffled = shuffleArray(deck);
-      render(shuffled);
-      const cards = board.querySelectorAll('.card');
-      cards.forEach((c, idx)=>{
-        c.classList.remove('is-flipped');
-        setTimeout(()=> c.classList.add('is-flipped'), 100 + idx*60);
-      });
-    });
-
-    revealAllBtn.addEventListener('click', ()=>{
-      const cards = board.querySelectorAll('.card');
-      const anyHidden = Array.from(cards).some(c=> !c.classList.contains('is-flipped'));
-      cards.forEach((c, idx)=> setTimeout(()=> c.classList.toggle('is-flipped', anyHidden), idx*30));
-    });
-
-    window.addEventListener('keydown', (e)=>{ if(e.key.toLowerCase()==='r'){ shuffleBtn.click(); } });
-
-    window.tarot = {
-      shuffle: ()=> shuffleBtn.click(),
-      revealAll: ()=> revealAllBtn.click(),
-      deck
-    };
+    document.getElementById('drawBtn').addEventListener('click', drawCard);
   </script>
 </body>
 </html>
