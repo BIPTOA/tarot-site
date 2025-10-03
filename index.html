@@ -46,6 +46,7 @@
       max-height: 70vh;
       border-radius: 12px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      margin-bottom: 12px;
     }
 
     .card-name {
@@ -57,6 +58,19 @@
     .error {
       margin-top: 12px;
       color: #ff6b6b;
+    }
+
+    .all-cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .all-cards-container video {
+      max-width: 300px;
+      max-height: 300px;
     }
   </style>
 </head>
@@ -76,13 +90,13 @@
     function drawCard() {
       const idx = Math.floor(Math.random() * cardNames.length);
       const name = cardNames[idx];
-      const id = idx; // <-- numbering shifted down by 1
+      const id = idx; // numbering matches your videos
       const result = document.getElementById('result');
       result.innerHTML = '';
 
       // Create video element
       const video = document.createElement('video');
-      video.src = `cards/card${id}.mp4`; // video file matches new numbering
+      video.src = `cards/card${id}.mp4`;
       video.autoplay = true;
       video.loop = true;
       video.muted = true;
@@ -103,6 +117,49 @@
       label.className = 'card-name';
       label.textContent = `${id}. ${name}`;
       result.appendChild(label);
+
+      // "See All Cards" button
+      const seeAllBtn = document.createElement('button');
+      seeAllBtn.textContent = 'See All Cards';
+      seeAllBtn.addEventListener('click', showAllCards);
+      result.appendChild(seeAllBtn);
+    }
+
+    function showAllCards() {
+      const result = document.getElementById('result');
+      result.innerHTML = ''; // clear previous content
+
+      const container = document.createElement('div');
+      container.className = 'all-cards-container';
+
+      cardNames.forEach((name, id) => {
+        const cardWrapper = document.createElement('div');
+
+        const video = document.createElement('video');
+        video.src = `cards/card${id}.mp4`;
+        video.autoplay = true;
+        video.loop = true;
+        video.muted = true;
+        video.playsInline = true;
+        video.controls = true;
+
+        video.onerror = () => {
+          const errorMsg = document.createElement('div');
+          errorMsg.className = 'error';
+          errorMsg.textContent = `Video cards/card${id}.mp4 failed to load. Check the path!`;
+          cardWrapper.appendChild(errorMsg);
+        };
+
+        const label = document.createElement('div');
+        label.className = 'card-name';
+        label.textContent = `${id}. ${name}`;
+
+        cardWrapper.appendChild(video);
+        cardWrapper.appendChild(label);
+        container.appendChild(cardWrapper);
+      });
+
+      result.appendChild(container);
     }
 
     document.getElementById('drawBtn').addEventListener('click', drawCard);
