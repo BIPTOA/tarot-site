@@ -12,12 +12,17 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(180deg,#071026,#071733);
+      background: linear-gradient(180deg, #071026, #071733);
       font-family: system-ui, sans-serif;
       color: #e6eef8;
       text-align: center;
     }
-    h1 { margin-bottom: 20px; font-size: 24px; }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
     button {
       background: #7c3aed;
       border: none;
@@ -27,19 +32,32 @@
       color: white;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 6px 20px rgba(124,58,237,0.25);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.25);
       transition: background 0.3s;
       margin-bottom: 20px;
     }
-    button:hover { background: #6d28d9; }
+
+    button:hover {
+      background: #6d28d9;
+    }
+
     video {
       max-width: 90%;
       max-height: 70vh;
       border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
-    .card-name { margin-top: 12px; font-size: 20px; font-weight: 600; }
-    .error { margin-top: 12px; color: #ff6b6b; }
+
+    .card-name {
+      margin-top: 12px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .error {
+      margin-top: 12px;
+      color: #ff6b6b;
+    }
   </style>
 </head>
 <body>
@@ -49,75 +67,41 @@
 
   <script>
     const cardNames = [
-      'The Fool',          // 0
-      'The Magician',      // 1
-      'The High Priestess',// 2
-      'The Empress',       // 3
-      'The Emperor',       // 4
-      'The Hierophant',    // 5
-      'The Lovers',        // 6
-      'The Chariot',       // 7
-      'Strength',          // 8
-      'The Hermit',        // 9
-      'Wheel of Fortune',  // 10
-      'Justice',           // 11
-      'The Hanged Man',    // 12
-      'Death',             // 13
-      'Temperance',        // 14
-      'The Devil',         // 15
-      'The Tower',         // 16
-      'The Star',          // 17
-      'The Moon',          // 18
-      'The Sun',           // 19
-      'Judgement'          // 20
+      'The Fool', 'The Magician', 'The High Priestess', 'The Empress', 'The Emperor',
+      'The Hierophant', 'The Lovers', 'The Chariot', 'Strength', 'The Hermit',
+      'Wheel of Fortune', 'Justice', 'The Hanged Man', 'Death', 'Temperance',
+      'The Devil', 'The Tower', 'The Star', 'The Moon', 'The Sun', 'Judgement'
     ];
 
     function drawCard() {
       const idx = Math.floor(Math.random() * cardNames.length);
       const name = cardNames[idx];
+      const id = idx + 1;
       const result = document.getElementById('result');
       result.innerHTML = '';
 
       // Create video element
       const video = document.createElement('video');
+      video.src = `cards/card${id}.mp4`; // updated folder
       video.autoplay = true;
       video.loop = true;
       video.muted = true;
       video.playsInline = true;
-      video.controls = true;
+      video.controls = true; // temporary control to check loading
 
-      // Attempt to load multiple common extensions
-      const formats = ['mp4', 'webm', 'ogg'];
-      let loaded = false;
-
-      formats.forEach(ext => {
-        if (!loaded) {
-          const source = document.createElement('source');
-          source.src = `cards/card${idx}.${ext}`;
-          source.type = `video/${ext}`;
-          source.onerror = () => {
-            console.warn(`Failed to load: cards/card${idx}.${ext}`);
-          };
-          video.appendChild(source);
-        }
-      });
-
-      video.onloadeddata = () => { loaded = true; };
       video.onerror = () => {
-        if (!loaded) {
-          const errorMsg = document.createElement('div');
-          errorMsg.className = 'error';
-          errorMsg.textContent = `Video for "${name}" failed to load. Check the path and format!`;
-          result.appendChild(errorMsg);
-        }
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'error';
+        errorMsg.textContent = `Video cards/card${id}.mp4 failed to load. Check the path!`;
+        result.appendChild(errorMsg);
       };
 
       result.appendChild(video);
 
-      // Card label
+      // Card name label
       const label = document.createElement('div');
       label.className = 'card-name';
-      label.textContent = `${idx}. ${name}`;
+      label.textContent = `${id}. ${name}`;
       result.appendChild(label);
     }
 
